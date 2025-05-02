@@ -1,0 +1,15 @@
+{
+  "github.copilot.enable": {
+    "*": false,
+    "plaintext": false,
+    "markdown": true,
+    "scminput": false
+  },
+  "files.associations": {
+    "array": "cpp",
+    "string": "cpp",
+    "iostream": "cpp",
+    "ostream": "cpp",
+    "new": "cpp"
+  }
+}
