@@ -46,12 +46,92 @@ class AVLTree{
                 //considering -1 for null
                 break;
             }
-            insertNode(this->root,data);
+           this->root= insertNode(this->root,data);
         }
     }
 
     Node* getRoot(){
         return this->root;
+    }
+
+    Node* leftRotate(Node* node){
+        /**
+         * @brief left rotate
+         *        
+         *        p                                    c
+         *      /  \      left rotate P              /  \
+         *     t1   c      ----------------->       p    t3
+         *         /  \                            / \
+         *       t2   t3                          t1  t2
+         */
+
+        Node* c=node->right;
+        Node* t2= node->right->left;
+     
+        node->right=t2;
+        c->left=node;
+
+        //update height
+        node->height= max(getHeight(node->left),getHeight(node->right))+1;
+        c->height= max(getHeight(c->left),getHeight(c->right))+1;
+
+        return c;
+    }
+
+    Node* rightRotate(Node* node){
+        /**
+         * @brief right rotate
+         *        
+         *        p                                    c
+         *      /  \      right rotatate P           /  \
+         *     c    t3   ----------------->         t1   p
+         *   /  \                                       / \
+         *  t1  t2                                    t2   t3
+         */
+
+         Node* c=node->left;
+         Node* t2= node->left->right;
+      
+         node->left=t2;
+         c->right=node;
+        
+         //update height
+        node->height= max(getHeight(node->left),getHeight(node->right))+1;
+        c->height= max(getHeight(c->left),getHeight(c->right))+1;
+
+         return c;
+        
+    }
+
+
+    Node* avlCheck(Node* node){
+
+        int balance = getBalanceFactor(node);
+
+    // Left-Left (LL) Case
+    if (balance > 1 && getBalanceFactor(node->left) >= 0) {
+        return rightRotate(node);
+    }
+
+    // Left-Right (LR) Case
+    if (balance > 1 && getBalanceFactor(node->left) < 0) {
+        node->left = leftRotate(node->left);
+        return rightRotate(node);
+    }
+
+    // Right-Right (RR) Case
+    if (balance < -1 && getBalanceFactor(node->right) <= 0) {
+        return leftRotate(node);
+    }
+
+    // Right-Left (RL) Case
+    if (balance < -1 && getBalanceFactor(node->right) > 0) {
+        node->right = rightRotate(node->right);
+        return leftRotate(node);
+    }
+
+    // Return the unchanged node pointer
+    return node;
     }
 
     Node* insertNode(Node* node,int data){
@@ -62,35 +142,20 @@ class AVLTree{
         }
 
         if(data<node->data){
-
-            if(node->left==nullptr){
-
             node->left=insertNode(node->left,data);
-            node->height++;
-            cout<<endl<<data<<" inserted at left of "<<node->data;
-
-            }
-            else{
-
-                insertNode(node->left,data);
-            }
-        }else if (data > node->data){
-
-            if(node->right==nullptr){
-
+            
+        }
+        else if(data>node->data){
             node->right=insertNode(node->right,data);
-            cout<<endl<<data<<" inserted at right of "<<node->data;
-
-            }
-            else{
-                insertNode(node->right,data);
-            }
-
-        }else{
-            return node;
+            
+        }else {
+            
+        return node;
         }
 
         node->height=max(getHeight(node->left),getHeight(node->right))+1;
+
+        return avlCheck(node);
     }
 
     void inOrderTraversal(Node* node){
