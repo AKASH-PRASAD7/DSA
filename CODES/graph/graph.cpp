@@ -1,6 +1,7 @@
 #include<iostream>
 #include<vector>
 #include<map>
+#include<queue>
 using namespace std;
 
 void adjacencyMatrixImplementation(int nodes,vector<vector<int>> edgeList){
@@ -24,6 +25,61 @@ void adjacencyMatrixImplementation(int nodes,vector<vector<int>> edgeList){
     }
 }
 
+void bfs(int source,map<int, vector<int>> graph){
+    /**
+         * @brief BFS Traversal
+         * 
+         * 1) Requirements:
+         *    - A queue to keep track of nodes to visit next.
+         *    - A map (or set) to track visited nodes.
+         * 
+         * 2) Loop through all nodes in the graph (to handle disconnected components).
+         * 
+         * 3) If the node is not visited:
+         *    a) Push the node into the queue.
+         *    b) Mark it as visited.
+         * 
+         * 4) While the queue is not empty:
+         *    a) Pop the front node.
+         *    b) Process it (e.g., print it).
+         *    c) For each neighbor of this node:
+         *        - If it's not visited:
+         *            - Push it into the queue.
+         *            - Mark as visited.
+         * 
+    */
+
+     queue<int> nodes;
+     map<int,bool> visited;
+
+     nodes.push(source);
+     visited[source]=true;
+
+     while(!nodes.empty()){
+
+        cout<<nodes.front()<<"->";
+
+        for(int i=0; i<graph[nodes.front()].size(); i++){
+      
+         
+            if(!visited[graph[nodes.front()][i]]){
+                //not visited
+                nodes.push(graph[nodes.front()][i]);
+
+                //then mark as visited
+                visited[graph[nodes.front()][i]]=true;
+            }
+
+        }
+        //pop the visited one
+        nodes.pop();
+
+     }
+
+
+
+}
+
 void adjacencyListImplementation(vector<vector<int>> edgeList){
     /**
      * @brief 
@@ -44,13 +100,15 @@ void adjacencyListImplementation(vector<vector<int>> edgeList){
         graphMap[from].push_back(to);
     }
 
-    for (auto it = graphMap.begin(); it != graphMap.end(); ++it) {
-        cout << it->first << " -> ";
-        for (int neighbor : it->second) {
+    for (auto& node : graphMap) {
+        cout << node.first << "  -> ";
+        for (int neighbor : node.second) {
             cout << neighbor << " ";
         }
         cout << endl;
     }
+    //source it one
+    bfs(1,graphMap);
 
 }
 
@@ -75,7 +133,7 @@ int main(){
      int nodes=5; //skipping 0
 
      //directed graph
-     adjacencyMatrixImplementation(nodes,edgeList);
+    //  adjacencyMatrixImplementation(nodes,edgeList);
      cout<<endl;
      adjacencyListImplementation(edgeList);
 
