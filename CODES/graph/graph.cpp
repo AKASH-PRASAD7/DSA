@@ -304,6 +304,84 @@ void cycleDetectionBFS(vector<vector<int>> &edgeList){
 
 }
 
+
+bool dfsCycle(int node,map<int,bool> &visited,int par, map<int, vector<int>> &graph){
+
+    
+   
+    visited[node]=true;
+   
+
+    for(auto neighbour: graph[node]){
+        if(!visited[neighbour]){
+
+            
+            if(dfsCycle(neighbour,visited,node,graph)){
+                return true;
+            }
+        }else if(neighbour!=par){
+            return true;
+        }
+    }
+
+    return false;
+}
+
+void dfsCycleDetect(vector<vector<int>> edgeList){
+    //create adjacency graph
+
+    map<int, vector<int>> graph;
+
+    for(int i=0; i<edgeList.size(); i++){
+
+        int first = edgeList[i][0];
+        int second = edgeList[i][1];
+
+        //undirected
+        graph[first].push_back(second);
+        graph[second].push_back(first);
+    }
+
+    for(const auto& node: graph){
+        cout<<node.first<<"->";
+        for(int i=0; i<node.second.size();i++){
+            cout<<node.second[i]<<" ,";
+        }
+            cout<<endl;
+    }
+
+    /**
+     * @brief cycle detection
+     * 
+     * 1) same as dfs traversal
+     * 2) need one data structure to keep track of parent
+     * 3) cycle condition if node if visited and it not equal to cuurent parrent
+     * 
+     */
+
+
+     map<int,bool>visited;
+    bool cycle=false;
+
+    int par=-1;
+
+     for(const auto& node:graph){
+        if(!visited.count(node.first)){
+
+         
+
+            cycle = dfsCycle(node.first,visited,par,graph);
+            if(cycle){
+                cout<<"cycle detected";
+                return;
+            }
+
+        }
+     }
+
+     cout<<"no cycle";
+}
+
 int main(){
     /**
      * @brief Graph implementation undirected/bidirection
@@ -334,5 +412,6 @@ int main(){
      cout<<endl;
     //  adjacencyListImplementation(edgeList);
 
-    cycleDetectionBFS(edgeList);
+    // cycleDetectionBFS(edgeList);
+    dfsCycleDetect(edgeList);
 }
