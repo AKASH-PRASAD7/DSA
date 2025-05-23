@@ -213,6 +213,96 @@ void adjacencyListImplementation(vector<vector<int>> &edgeList){
     dfs(graphMap);
 }
 
+bool bfsCycle(int node,map<int, vector<int>> &graph,map<int, bool> &visited){
+    
+    
+    queue<int> nodes;
+     map<int,int> parent;
+
+     nodes.push(node);
+     visited[node]=true;
+     parent[node]=-1;
+
+     while(!nodes.empty()){
+        int current= nodes.front();
+        nodes.pop();
+
+        for(int neighbor: graph[current]){
+            
+                if(!visited[neighbor]){
+                    visited[neighbor]=true;
+                    parent[neighbor]=current;
+                    nodes.push(neighbor);
+                }else if( parent[current]!=neighbor){
+         
+                    return true;
+                }
+            
+        }
+
+
+     }
+
+
+    return false;
+}
+
+void cycleDetectionBFS(vector<vector<int>> &edgeList){
+    //create adjacency graph
+
+    map<int, vector<int>> graph;
+
+    for(int i=0; i<edgeList.size(); i++){
+
+        int first = edgeList[i][0];
+        int second = edgeList[i][1];
+
+        //undirected
+        graph[first].push_back(second);
+        graph[second].push_back(first);
+    }
+
+    for(const auto& node: graph){
+        cout<<node.first<<"->";
+        for(int i=0; i<node.second.size();i++){
+            cout<<node.second[i]<<" ,";
+        }
+            cout<<endl;
+    }
+
+    /**
+     * @brief cycle detection
+     * 
+     * 1) same as bfs traversal
+     * 2) need one data structure to keep track of parent
+     * 3) cycle condition if node if visited and it not equal to cuurent parrent
+     * 
+     */
+
+     map<int, bool> visited;
+
+     bool cycle=false;
+
+     for(const auto& node: graph){
+
+            if(!visited[node.first]){
+
+                cycle= bfsCycle(node.first,graph,visited);
+            }
+
+           if(cycle){
+            cout<<"cycle detected";
+            return;
+            
+           }
+        
+     }
+
+     if(!cycle){
+        cout<<"no cycle";
+     }
+
+}
 
 int main(){
     /**
@@ -229,14 +319,20 @@ int main(){
      * 
      */
 
-     vector<vector<int>> edgeList={{1,2},{1,3},{2,1},{2,3},{2,4},{4,2},{4,3},{5,6}};
+     vector<vector<int>> edgeList={{1,2},{1,3},{2,3},{2,4},{4,3},{5,6}};
+    // vector<vector<int>> edgeList = {
+    //     {1, 2},
+    //     {1, 3},
+    //     {3, 4},
+    //     {5, 6}
+    // };
 
      int nodes=7; //skipping 0
 
      //directed graph
     //  adjacencyMatrixImplementation(nodes,edgeList);
      cout<<endl;
-     adjacencyListImplementation(edgeList);
+    //  adjacencyListImplementation(edgeList);
 
-      
+    cycleDetectionBFS(edgeList);
 }
