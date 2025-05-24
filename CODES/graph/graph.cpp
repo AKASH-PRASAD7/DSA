@@ -382,6 +382,69 @@ void dfsCycleDetect(vector<vector<int>> edgeList){
      cout<<"no cycle";
 }
 
+bool dfsCycle(int source,map<int,bool> &visited,map<int,bool> &dfs, map<int,vector<int>> &graph ){
+    visited[source]=true;
+    dfs[source]=true;
+   
+
+    for(const auto& neighbour: graph[source]){
+        if(!visited[neighbour]){
+            if(dfsCycle(neighbour,visited,dfs,graph))
+                {
+                    return true;
+                }
+        }else if(dfs[neighbour]){
+            return true;
+        }
+    }
+    dfs[source]=false;
+    return false;
+}
+
+void dfsDetectDirected(vector<vector<int>> &edgeList){
+    /**
+     * @brief Undirected dfs cycle detect
+     * 
+     *       1 → 2 → 3 → 7
+                ↓    ↘  ↑
+                4      8 
+               ↓  ↑
+              5 → 6 
+
+     * 
+        1) requirement dfs trackers
+        2) do normal dfs but with every dfs call store it
+        3) if visited and dfsmarked are true then cycle present
+     */
+
+     //graph
+     map<int,vector<int>> graph;
+
+     for(int i=0; i<edgeList.size(); i++){
+        int from = edgeList[i][0];
+        int to = edgeList[i][1];
+
+        graph[from].push_back(to);
+     }
+
+
+
+     map<int,bool>visited;
+     map<int,bool>dfs;
+
+     for(const auto& node: graph){
+        if(!visited.count(node.first)){
+
+            if(dfsCycle(node.first,visited,dfs,graph)){
+                cout<<"cycle detected";
+                return;
+            }
+        }
+     }
+
+     cout<<"no cycle detected";
+}
+
 int main(){
     /**
      * @brief Graph implementation undirected/bidirection
@@ -397,7 +460,8 @@ int main(){
      * 
      */
 
-     vector<vector<int>> edgeList={{1,2},{1,3},{2,3},{2,4},{4,3},{5,6}};
+     vector<vector<int>> edgeList={{1,2},{2,3},{2,4},{3,7},{3,8},{4,5},{5,6},{6,4},{8,7}};
+    //  vector<vector<int>> edgeList={{1,2},{1,3},{2,3},{2,4},{4,3},{5,6}};
     // vector<vector<int>> edgeList = {
     //     {1, 2},
     //     {1, 3},
@@ -413,5 +477,7 @@ int main(){
     //  adjacencyListImplementation(edgeList);
 
     // cycleDetectionBFS(edgeList);
-    dfsCycleDetect(edgeList);
+    // dfsCycleDetect(edgeList);
+
+    dfsDetectDirected(edgeList);
 }
