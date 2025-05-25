@@ -497,6 +497,81 @@ void toplogicalSort(vector<vector<int>> &edgeList){
     
 }
 
+
+
+
+void topologicalSortBfs(vector<vector<int>> &edgeList){
+    /**
+         * @brief Topological Sort using BFS (Kahn's Algorithm)
+         * 
+         * Step-by-step:
+         * 
+         * 1. Build the graph using an adjacency list.
+         * 2. Create an 'indegree' array/map to count how many edges point into each node.
+         * 3. Loop through the indegree map:
+         *    - Push all nodes with indegree 0 into a queue (they have no dependencies).
+         * 
+         * 4. While the queue is not empty:
+         *    - Pop a node from the front of the queue.
+         *    - Add it to the result (topological order).
+         *    - For each neighbor of this node:
+         *        - Decrease its indegree by 1.
+         *        - If its indegree becomes 0, push it into the queue.
+         * 
+         * 5. After the loop, the result list will contain the topological order.
+         *    - If the result doesn't contain all nodes, a cycle exists in the graph.
+         * 
+    */
+
+
+    //graph create
+
+    map<int, vector<int>> graph;
+
+    vector<int> indegree(20); //adjsust according to node size
+
+    for(int i=0; i<edgeList.size(); i++){
+        int from=edgeList[i][0];
+        int to=edgeList[i][1];
+
+        graph[from].push_back(to);
+
+        //implementing indegree 
+        indegree[to]++;
+    }
+
+   
+
+    queue<int> nodes;
+    vector<int> topologicalSort;
+
+    for(const auto& node: graph){
+        if(indegree[node.first]==0){
+            nodes.push(node.first);
+        }
+    }
+            while(!nodes.empty()){
+                int front=nodes.front();
+                nodes.pop();
+                topologicalSort.push_back(front);
+
+                for(auto& neighbour: graph[front]){
+                    indegree[neighbour]--;
+                    if(indegree[neighbour]==0){
+                        nodes.push(neighbour);
+                    }
+                }
+            }
+        
+    
+
+   for(int i=0; i<topologicalSort.size(); i++){
+        cout<<topologicalSort[i]<<"->";
+   }
+
+}
+
+
 int main(){
     /**
      * @brief Graph implementation undirected/bidirection
@@ -512,7 +587,8 @@ int main(){
      * 
      */
 
-     vector<vector<int>> edgeList={{1,2},{2,3},{2,4},{3,7},{3,8},{4,5},{5,6},{6,4},{8,7}};
+     vector<vector<int>> edgeList={{1,2},{1,3},{2,5},{3,5},{5,4}};
+    //  vector<vector<int>> edgeList={{1,2},{2,3},{2,4},{3,7},{3,8},{4,5},{5,6},{6,4},{8,7}};
     //  vector<vector<int>> edgeList={{1,2},{1,3},{2,3},{2,4},{4,3},{5,6}};
     // vector<vector<int>> edgeList = {
     //     {1, 2},
@@ -533,5 +609,7 @@ int main(){
 
     // dfsDetectDirected(edgeList);
 
-    toplogicalSort(edgeList);
+    // toplogicalSort(edgeList);
+
+    topologicalSortBfs(edgeList);
 }
