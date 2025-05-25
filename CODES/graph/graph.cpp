@@ -2,6 +2,7 @@
 #include<vector>
 #include<map>
 #include<queue>
+#include<stack>
 using namespace std;
 
 void adjacencyMatrixImplementation(int nodes,vector<vector<int>> edgeList){
@@ -445,6 +446,57 @@ void dfsDetectDirected(vector<vector<int>> &edgeList){
      cout<<"no cycle detected";
 }
 
+void dfsToplogical(int node,vector<int> &visited,stack<int> &sort,map<int, vector<int>> &graph ){
+    visited[node]=1;
+
+    for(const auto& neighbour: graph[node]){
+        if(!visited[neighbour]){
+            dfsToplogical(neighbour,visited,sort,graph);
+        }
+    }
+
+    sort.push(node);
+
+} 
+
+void toplogicalSort(vector<vector<int>> &edgeList){
+    //graph creation
+
+    map<int, vector<int>> graph;
+
+    for(int i=0; i<edgeList.size(); i++){
+        int from = edgeList[i][0];
+        int to = edgeList[i][1];
+
+        graph[from].push_back(to);
+    }
+
+    /**
+     * @brief Topolgical sort- it folows a order 
+     * eg. if 3->2,1
+     * then 3 should come first for valid topological sort- >3 ,2, 1
+     * 
+     * 1)normal dfs algo and for node with no dfs call remaining push it into stack
+     * 
+     */
+
+
+    vector<int> visited(20,0); //adjust according to no of nodes
+    stack<int> sort;
+
+    for(const auto& node: graph){
+        if(!visited[node.first]){
+            dfsToplogical(node.first,visited,sort,graph);
+        }
+    }
+
+    while(!sort.empty()){
+        cout<<sort.top()<<"->";
+        sort.pop();
+    }
+    
+}
+
 int main(){
     /**
      * @brief Graph implementation undirected/bidirection
@@ -479,5 +531,7 @@ int main(){
     // cycleDetectionBFS(edgeList);
     // dfsCycleDetect(edgeList);
 
-    dfsDetectDirected(edgeList);
+    // dfsDetectDirected(edgeList);
+
+    toplogicalSort(edgeList);
 }
