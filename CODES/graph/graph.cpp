@@ -3,6 +3,7 @@
 #include<map>
 #include<queue>
 #include<stack>
+#include <utility>
 using namespace std;
 
 void adjacencyMatrixImplementation(int nodes,vector<vector<int>> edgeList){
@@ -632,6 +633,74 @@ void shortTestPathBFS(int source, int destination,vector<vector<int>> &edgeList)
      }
 }
 
+void dfsShortestPath(int source,map<int,bool> &visited,stack<int> &topologicalSort,map<int,vector<pair<int,int>>> &graph){
+    visited[source]=true;
+
+    for(auto& neighbour: graph[source]){
+        if(!visited[neighbour.first]){
+            dfsShortestPath(neighbour.first,visited,topologicalSort,graph);
+        }
+    }
+
+    topologicalSort.push(source);
+}
+
+void shortesPathInWeightedGraph(int source,int destination,vector<vector<int>> &edgeList){
+    /**
+     * @brief Shortest path in directed acyclic weighted graph
+     * 
+     * 1) find toplogical sort
+     * 2) with help of topological sort find shortest path from source to all nodes
+     * 3) initailize with infinty at first, for source it will be 0
+     */
+
+     //graph
+
+     map<int,vector<pair<int,int>>> graph;
+
+     for(int i=0; i<edgeList.size(); i++){
+        int from = edgeList[i][0];
+        int to = edgeList[i][1];
+        int weight = edgeList[i][2];
+
+        graph[from].push_back({to,weight});
+     }
+
+
+     map<int,bool> visited;
+     stack<int> topologicalSort;
+
+    dfsShortestPath(source,visited,topologicalSort,graph);
+
+ 
+   vector<int> distance(6,INT16_MAX); //adjust accroding to no of node
+
+    //setting source 0
+   distance[source]=0;
+
+   while(!topologicalSort.empty()){
+
+        if(distance[topologicalSort.top()]==INT16_MAX){
+            //if distance infinity then pop
+            topologicalSort.pop();
+        }else{
+            int current=topologicalSort.top();
+
+            for(auto& neighbour: graph[current]){
+                //update distance only if its less
+                if(distance[neighbour.first]> distance[current] +neighbour.second){
+                    distance[neighbour.first] = distance[current] +neighbour.second;
+                }
+            }
+            topologicalSort.pop();
+        }
+   }
+
+   for(int i=0; i<distance.size(); i++){
+     cout<<distance[i]<<", ";
+   }
+}
+
 
 int main(){
     /**
@@ -648,9 +717,21 @@ int main(){
      * 
      */
 
-     vector<vector<int>> edgeList={{1,2},{1,3},{1,4},{2,1},{2,5},{3,1},{3,8},{4,1},{4,6},{5,2},{5,8},{6,4},{6,7}
-    ,{7,6},{7,8},{8,3},{8,5},{8,7}
-    };
+   vector<vector<int>> edgeList = {
+    {1, 3, 6},
+    {1, 2, 2},
+    {0, 1, 5},
+    {0, 2, 3},
+    {3, 4, -1},
+    {2, 4, 4},
+    {2, 5, 2},
+    {2, 3, 7},
+    {4, 5, -2}
+};
+    
+    //  vector<vector<int>> edgeList={{1,2},{1,3},{1,4},{2,1},{2,5},{3,1},{3,8},{4,1},{4,6},{5,2},{5,8},{6,4},{6,7}
+    // ,{7,6},{7,8},{8,3},{8,5},{8,7}
+    // };
     //  vector<vector<int>> edgeList={{1,2},{1,3},{2,5},{3,5},{5,4}};
     //  vector<vector<int>> edgeList={{1,2},{2,3},{2,4},{3,7},{3,8},{4,5},{5,6},{6,4},{8,7}};
     //  vector<vector<int>> edgeList={{1,2},{1,3},{2,3},{2,4},{4,3},{5,6}};
@@ -676,5 +757,7 @@ int main(){
     // toplogicalSort(edgeList);
 
     // topologicalSortBfs(edgeList);
-    shortTestPathBFS(1,8,edgeList);
+    // shortTestPathBFS(1,8,edgeList);
+
+    shortesPathInWeightedGraph(1,5,edgeList);
 }
