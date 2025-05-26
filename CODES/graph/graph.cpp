@@ -562,13 +562,74 @@ void topologicalSortBfs(vector<vector<int>> &edgeList){
                     }
                 }
             }
-        
-    
+        //check for cycle
+        if (topologicalSort.size() != indegree.size()) {
+                cout << "Cycle detected or incomplete graph." << endl;
+                return;
+        }
 
    for(int i=0; i<topologicalSort.size(); i++){
         cout<<topologicalSort[i]<<"->";
    }
 
+}
+
+
+void shortTestPathBFS(int source, int destination,vector<vector<int>> &edgeList){
+    /**
+     * @brief Shortest path in graph algo 
+     * - BFS algo with a parent node tracker
+     * - After all node visited, backtrack from destination with parent nodes DS
+     * 
+     */
+
+     //graph
+
+     map<int, vector<int>> graph;
+
+     for(int i=0; i<edgeList.size(); i++){
+        int from = edgeList[i][0];
+        int to = edgeList[i][1];
+
+        graph[from].push_back(to);
+        graph[to].push_back(from);
+     }
+
+     map<int,bool> visited;
+     map<int,int> parent;
+     queue<int> nodes;
+
+     
+
+            nodes.push(source);
+            parent[source]= -1;
+
+            while (!nodes.empty())
+            {   
+                int front = nodes.front();
+                visited[front]=true;
+                nodes.pop();
+
+                for(auto& neighbour: graph[front]){
+                    if(!visited[neighbour]){
+                        visited[neighbour]=true;
+                        parent[neighbour]=front;
+                        nodes.push(neighbour);
+                    }
+                }
+            }
+            
+      
+    
+    int ptr=destination;
+
+     while(ptr!=source){
+        if(ptr==destination){
+            cout<<destination<<"<-";
+        }
+        cout<<parent[ptr]<<"<-";
+        ptr=parent[ptr];
+     }
 }
 
 
@@ -587,7 +648,10 @@ int main(){
      * 
      */
 
-     vector<vector<int>> edgeList={{1,2},{1,3},{2,5},{3,5},{5,4}};
+     vector<vector<int>> edgeList={{1,2},{1,3},{1,4},{2,1},{2,5},{3,1},{3,8},{4,1},{4,6},{5,2},{5,8},{6,4},{6,7}
+    ,{7,6},{7,8},{8,3},{8,5},{8,7}
+    };
+    //  vector<vector<int>> edgeList={{1,2},{1,3},{2,5},{3,5},{5,4}};
     //  vector<vector<int>> edgeList={{1,2},{2,3},{2,4},{3,7},{3,8},{4,5},{5,6},{6,4},{8,7}};
     //  vector<vector<int>> edgeList={{1,2},{1,3},{2,3},{2,4},{4,3},{5,6}};
     // vector<vector<int>> edgeList = {
@@ -611,5 +675,6 @@ int main(){
 
     // toplogicalSort(edgeList);
 
-    topologicalSortBfs(edgeList);
+    // topologicalSortBfs(edgeList);
+    shortTestPathBFS(1,8,edgeList);
 }
