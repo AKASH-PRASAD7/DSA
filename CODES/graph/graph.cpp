@@ -4,6 +4,7 @@
 #include<queue>
 #include<stack>
 #include <utility>
+#include <climits>
 using namespace std;
 
 void adjacencyMatrixImplementation(int nodes,vector<vector<int>> edgeList){
@@ -702,6 +703,89 @@ void shortesPathInWeightedGraph(int source,int destination,vector<vector<int>> &
 }
 
 
+void dijkstra(int source,int destination,vector<vector<int>> &edgeList){
+    /**
+     * @brief Dijkstra algo
+     * - reuirement pripority queue to  store (dist,node)
+     * 
+     * 1) start from source node mark source node distance 0
+     * 2) traverse its neighbour like BFS 
+     * 3) if dist of source to neigh+ source dist < neighb distance
+     * 4) then update distance of neighbour and psuh push
+     * 5) rpeat 
+     * 
+     * 
+     * 
+     */
+
+
+     //graph
+
+     map<int,vector<vector<int>>> graph;
+
+     for(int i=0; i<edgeList.size(); i++){
+        int from = edgeList[i][0];
+        int to = edgeList[i][1];
+        int dist = edgeList[i][2];
+
+        //undirected
+
+        graph[from].push_back({to,dist});
+        graph[to].push_back({from,dist});
+     }
+
+     priority_queue
+    <
+    pair<int,int>,                     // Type of elements (here: pair of {distance, node})
+    vector<pair<int,int>>,            // Underlying container (default is vector)
+    greater<pair<int,int>>            // Comparison function (min-heap instead of max-heap)
+    > 
+    nodes;
+
+     vector<int> distance(20,INT_MAX); //addjust according to no of nodes;
+
+     //set source dist 0
+     distance[source]=0;
+
+
+     // dist,node
+     nodes.push({0,source});
+
+     while(!nodes.empty()){
+        int currNode = nodes.top().second;
+        int currDist = nodes.top().first;
+
+        nodes.pop();
+
+        if (currDist > distance[currNode]) {
+            //skipping for efficinecy
+            continue;
+        }
+
+        for(const auto& neighbour: graph[currNode]){
+            int neighbourNode = neighbour[0];
+            int neighbourDist = neighbour[1];
+            
+            //check if distance more
+            if(distance[neighbourNode]> currDist+neighbourDist){
+                distance[neighbourNode]=currDist+neighbourDist;
+
+                nodes.push({distance[neighbourNode],neighbourNode});
+
+            }
+        }
+     }
+
+
+     for(int i=source;i<=destination;i++){
+        cout<<distance[i]<<", ";
+     }
+     
+
+
+
+}
+
 int main(){
     /**
      * @brief Graph implementation undirected/bidirection
@@ -717,17 +801,14 @@ int main(){
      * 
      */
 
-   vector<vector<int>> edgeList = {
-    {1, 3, 6},
-    {1, 2, 2},
-    {0, 1, 5},
-    {0, 2, 3},
-    {3, 4, -1},
-    {2, 4, 4},
-    {2, 5, 2},
-    {2, 3, 7},
-    {4, 5, -2}
-};
+     vector<vector<int>> edgeList = {
+        {0, 1, 4},
+        {0, 2, 1},
+        {2, 1, 2},
+        {1, 3, 1},
+        {2, 3, 5},
+        {3, 4, 3}
+    };
     
     //  vector<vector<int>> edgeList={{1,2},{1,3},{1,4},{2,1},{2,5},{3,1},{3,8},{4,1},{4,6},{5,2},{5,8},{6,4},{6,7}
     // ,{7,6},{7,8},{8,3},{8,5},{8,7}
@@ -759,5 +840,6 @@ int main(){
     // topologicalSortBfs(edgeList);
     // shortTestPathBFS(1,8,edgeList);
 
-    shortesPathInWeightedGraph(1,5,edgeList);
+    // shortesPathInWeightedGraph(1,5,edgeList);
+    dijkstra(1,4,edgeList);
 }
