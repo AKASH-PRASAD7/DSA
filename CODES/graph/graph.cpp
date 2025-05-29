@@ -865,6 +865,103 @@ void primsAlgo(int source,vector<vector<int>> &edgeList){
     
 }
 
+class DisjointSet{
+    /**
+     * @brief Disjoint set (used to tell that if two nodes are of same component or not)
+     * 
+     * - requirement a parent and rank or size array/vector
+     * 
+     * 1) initialize ranks of all node by 0/-1, and parent as themselves 
+     *  - if size assign all size as 1
+     * 2) (unionbyrank) take first two nodes set if both have same rank attach one to another or vices verse
+     *  and icrement rank of parent if ones rank is bigger then attach smaller to bigger, and mark parent 
+     *  accordingly in both cases
+     * 
+     *  (unionbysize) take first two nodes set if both have same size attach one to another or vices verse
+     *   if ones size is bigger then attach smaller to bigger, and mark parent accordingly in
+     *      both cases and update size of parent as + attched size
+     * 
+     * 3) repeat this for all ndoes set
+     * 
+     * 4) create a find utlimate parent function that returns ultimate parent of node
+     *  and also updates its, and it also does path compression by changing other nodes
+     *  parents aswell in process (backtracking)
+     * 
+     *  e.g--> 1->2->3->4 for ultimate parent of 1  it will return 1 and update others parents also
+     *          in process 1->4<-3   
+     *                       / 
+     *                      2     
+     * 
+     * 5) if two nodes have same ultimate parent then they are in same component
+     */ 
+    
+     
+    vector<int> rank, size, parent;
+
+    public:
+        DisjointSet(int nodes){
+            //intilaization
+            rank.resize(nodes+1,0);
+            size.resize(nodes+1,1);
+            parent.resize(nodes+1);
+            for(int i=1; i<=nodes;i++){
+                parent[i]=i;
+            }
+        }
+        int getParent(int node){
+            
+            //ultimate parent
+
+            if(node==parent[node]){
+                return node;
+            }
+            //updates parents and path compression
+           return parent[node]=getParent(parent[node]);
+       }
+
+       bool isSameComponent(int node1, int node2){
+         return getParent(node1) == getParent(node2);
+       }
+
+       void unionByRank(int node1,int node2){
+            //if both are already in same comp then return
+                if(getParent(node1)==getParent(node2)){
+                    return;
+                }
+
+            if(rank[node1]>rank[node2]){
+
+                parent[node2] = node1;
+                
+            }else if(rank[node2]>rank[node1]){
+
+                parent[node1] = node2;
+                
+            }else{
+                parent[node2] = node1;
+                rank[node1]++;
+            }
+       }
+       void unionBySize(int node1,int node2){
+            //if both are already in same comp then return
+                if(getParent(node1)==getParent(node2)){
+                    return;
+                }
+
+            if(size[node1]>size[node2]){
+
+                parent[node2] = node1;
+                size[node1] += size[node2];
+                
+            }else{
+
+                parent[node1] = node2;
+                size[node2] += size[node1];
+                
+            }
+       }
+};
+
 int main(){
     /**
      * @brief Graph implementation undirected/bidirection
@@ -879,6 +976,19 @@ int main(){
      * 1) no of nodes and edgelist
      * 
      */
+
+     //disjoint set
+
+     DisjointSet set(7);
+
+     set.unionBySize(1,2);
+     set.unionBySize(2,3);
+     set.unionBySize(4,5);
+     set.unionBySize(6,7);
+     set.unionBySize(5,6);
+     cout<<set.isSameComponent(3,7)<<endl;
+     set.unionBySize(3,7);
+     cout<<set.isSameComponent(3,7)<<endl;
 
      vector<vector<int>> edgeList = {
         {0, 1, 4},
@@ -921,5 +1031,5 @@ int main(){
 
     // shortesPathInWeightedGraph(1,5,edgeList);
     // dijkstra(1,4,edgeList);
-    primsAlgo(1,edgeList);
+    // primsAlgo(1,edgeList);
 }
