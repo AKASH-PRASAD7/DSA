@@ -5,6 +5,7 @@
 #include<stack>
 #include <utility>
 #include <climits>
+#include <unordered_map>
 using namespace std;
 
 void adjacencyMatrixImplementation(int nodes,vector<vector<int>> edgeList){
@@ -780,10 +781,88 @@ void dijkstra(int source,int destination,vector<vector<int>> &edgeList){
      for(int i=source;i<=destination;i++){
         cout<<distance[i]<<", ";
      }
+    
+
+}
+
+
+void primsAlgo(int source,vector<vector<int>> &edgeList){
+    /**
+     * @brief Prims algo used to find MST (minimum spanning tree)
+     * 
+     * 1) a min heap (priority queue) storing (weight,node,parent), 
+     * mst array storing edges , visited DS for nodes and a sum of mst weights 
+     * 
+     * 2) start from any node push it to queue with parent -1
+     * 3) start loop while queue not empty
+     * 4) if parent is -1 dont push it to MST, otherwise push current (node,parent) and weights to sum
+     * 5) mark current node visited and iterate over curr nodes neighbour
+     * 6) if neighbour unvisited push them to queue (weight-from-current-neeightbor,neighbour,current)
+     * 7) done
+     * 
+     */
+
+     //graph adjaceny list creation
+
+     unordered_map<int,vector<vector<int>>> graph;
+
+     for(int i=0; i<edgeList.size(); i++){
+        int from = edgeList[i][0];
+        int to = edgeList[i][1];
+        int weight = edgeList[i][2];
+
+        //undirected
+        graph[from].push_back({to,weight});
+        graph[to].push_back({from,weight});
+     }
+
+     int mstSum = 0;
+     priority_queue<vector<int>,vector<vector<int>>,greater<vector<int>>> nodes;
+     unordered_map<int,bool> visited;
+     vector<pair<int,int>> mst;
+
+     //push source (weight,node,parent)
+     nodes.push({0,0,-1});
+
+     while (!nodes.empty())
+     {
+        int topNode = nodes.top()[1];
+        int weight = nodes.top()[0];
+        int parent = nodes.top()[2];
+
+        if(visited[topNode]){
+            //skip if visited
+            nodes.pop();
+        }else{
+
+            //mark current node visted
+            visited[topNode]=true;
+
+            if(parent!=-1){
+                //push into mst and update sum only when there is parent
+                mst.push_back({parent,topNode});
+                mstSum += weight;
+            }
+
+            //traverse neighbours
+            for(auto & neighbour: graph[topNode]){
+                int neighBourNode = neighbour[0];
+                int neighBourWeight = neighbour[1];
+
+                if(!visited[neighBourNode]){
+                    nodes.push({neighBourWeight,neighBourNode,topNode});
+                }
+            }
+        }
+     }
+
+     cout<<mstSum<<endl;
+
+     for (auto& edge : mst) {
+        cout << edge.first << " - " << edge.second << endl;
+    }
      
-
-
-
+    
 }
 
 int main(){
@@ -841,5 +920,6 @@ int main(){
     // shortTestPathBFS(1,8,edgeList);
 
     // shortesPathInWeightedGraph(1,5,edgeList);
-    dijkstra(1,4,edgeList);
+    // dijkstra(1,4,edgeList);
+    primsAlgo(1,edgeList);
 }
