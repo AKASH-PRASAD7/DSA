@@ -925,42 +925,85 @@ class DisjointSet{
 
        void unionByRank(int node1,int node2){
             //if both are already in same comp then return
-                if(getParent(node1)==getParent(node2)){
-                    return;
-                }
-
-            if(rank[node1]>rank[node2]){
-
-                parent[node2] = node1;
-                
-            }else if(rank[node2]>rank[node1]){
-
-                parent[node1] = node2;
-                
-            }else{
-                parent[node2] = node1;
-                rank[node1]++;
+            int parent1 = getParent(node1);
+            int parent2 = getParent(node2);
+        
+            if (parent1 == parent2) return;
+        
+            if (rank[parent1] > rank[parent2]) {
+                parent[parent2] = parent1;
+            } else if (rank[parent2] > rank[parent1]) {
+                parent[parent1] = parent2;
+            } else {
+                parent[parent2] = parent1;
+                rank[parent1]++;
             }
        }
        void unionBySize(int node1,int node2){
             //if both are already in same comp then return
-                if(getParent(node1)==getParent(node2)){
-                    return;
-                }
-
-            if(size[node1]>size[node2]){
-
-                parent[node2] = node1;
-                size[node1] += size[node2];
-                
-            }else{
-
-                parent[node1] = node2;
-                size[node2] += size[node1];
-                
+            int parent1 = getParent(node1);
+            int parent2 = getParent(node2);
+        
+            if(parent1 == parent2) return;
+        
+            if(size[parent1] > size[parent2]) {
+                parent[parent2] = parent1;
+                size[parent1] += size[parent2];
+            } else {
+                parent[parent1] = parent2;
+                size[parent2] += size[parent1];
             }
        }
 };
+
+void krushkalsAlgo(int nodes,vector<vector<int>> &edgelist){
+    /**
+     * @brief Kruskalalgo to find MST
+     * 
+     * - requirement disjoint set DS and a sorted DS(priority queue) of item (weight,nodefrom, nodeto)
+     * 
+     * 1) Get top from queue
+     * 2) check if its in same component
+     * 3) if not union them otherwise skip
+     * 4) update the mst sum and repeat
+     */
+
+    //graph
+    unordered_map<int,vector<vector<int>>> graph;
+    priority_queue<vector<int>,vector<vector<int>>, greater<vector<int>>> edgeWeights;
+
+    for(int i=0; i<edgelist.size(); i++){
+        int from =  edgelist[i][0];
+        int to =  edgelist[i][1];
+        int weight =  edgelist[i][2];
+
+        
+        graph[from].push_back({to,weight});
+
+        //push in edgequeue (weight,nodefrom, nodeto)
+        edgeWeights.push({weight,from,to});
+        
+    }
+
+    //initialize disjoint set
+    DisjointSet s(nodes);
+    int mstSum = 0;
+
+    while(!edgeWeights.empty()){
+        int from = edgeWeights.top()[1];
+        int to = edgeWeights.top()[2];
+        int weight = edgeWeights.top()[0];
+
+        if(!s.isSameComponent(from,to)){
+            s.unionBySize(from,to);
+            mstSum += weight;
+        }
+        edgeWeights.pop();
+    }
+    
+
+    cout<<mstSum;
+}
 
 int main(){
     /**
@@ -979,16 +1022,16 @@ int main(){
 
      //disjoint set
 
-     DisjointSet set(7);
+    //  DisjointSet set(7);
 
-     set.unionBySize(1,2);
-     set.unionBySize(2,3);
-     set.unionBySize(4,5);
-     set.unionBySize(6,7);
-     set.unionBySize(5,6);
-     cout<<set.isSameComponent(3,7)<<endl;
-     set.unionBySize(3,7);
-     cout<<set.isSameComponent(3,7)<<endl;
+    //  set.unionBySize(1,2);
+    //  set.unionBySize(2,3);
+    //  set.unionBySize(4,5);
+    //  set.unionBySize(6,7);
+    //  set.unionBySize(5,6);
+    //  cout<<set.isSameComponent(3,7)<<endl;
+    //  set.unionBySize(3,7);
+    //  cout<<set.isSameComponent(3,7)<<endl;
 
      vector<vector<int>> edgeList = {
         {0, 1, 4},
@@ -1031,5 +1074,6 @@ int main(){
 
     // shortesPathInWeightedGraph(1,5,edgeList);
     // dijkstra(1,4,edgeList);
-    // primsAlgo(1,edgeList);
+    primsAlgo(1,edgeList);
+    krushkalsAlgo(5,edgeList);
 }
