@@ -1005,6 +1005,94 @@ void krushkalsAlgo(int nodes,vector<vector<int>> &edgelist){
     cout<<mstSum;
 }
 
+class Bridges{
+
+    int timer=1;
+
+  
+public:
+
+    int min(int val1, int val2){
+        return val1>val2 ? val2:val1;
+    } 
+
+    int dfsBridge(int node,int parent, unordered_map<int,bool> &visited,vector<int> &timeOfInsertion,vector<int> &lowestTimeToReach,unordered_map<int,vector<int>> &graph,vector<pair<int,int>> &bridge){
+        
+        visited[node]=true;
+
+        for(auto& neighbour:  graph[node]){
+            if(neighbour==parent) continue;
+
+            if(!visited[neighbour]){
+                timeOfInsertion[neighbour] = ++this->timer;
+                lowestTimeToReach[neighbour] = this->timer;
+
+                int child = dfsBridge(neighbour,node,visited,timeOfInsertion,lowestTimeToReach,graph,bridge);
+
+
+                lowestTimeToReach[node] = min(lowestTimeToReach[node], lowestTimeToReach[child]);
+
+                if(lowestTimeToReach[child] > timeOfInsertion[node]){
+                    //bridge exist
+                    bridge.push_back({node,child});
+                }
+            }else{
+                lowestTimeToReach[node] = min(lowestTimeToReach[node], lowestTimeToReach[neighbour]);
+            }
+        }
+        return node;
+
+    }
+
+void bridgesInGraph(vector<vector<int>> &edgeList){
+    /**
+     * @brief Find all edge in graph
+     * - A edge in a graph is a bridge when removing it increases 
+     *   the number of components
+     *  
+     *      1---2---3---4  (2-3) is edge
+     *      |   |    \ /
+     *      5---6     7
+     * - requirements insertion time of node(inst), lowest to get to node(lst)
+     * 
+     * 1) Start DFS traversal
+     * 2) mark first source node's inst(1) & lst(1)
+     * 3) then next of source if its not visited dsfcall for it
+     * 4) if visited and not parent then check for its lst if its less take it
+     * 5) after source nodes dfs call done for a neighbours
+     * 6) check for lst of the return node' dfs call if its less update it
+     * 7) then check for bridge if lst(neighbour) > inst(source) bridge exists
+     */
+    
+    //graph
+    unordered_map<int,vector<int>> graph; 
+
+    for(int i=0; i<edgeList.size(); i++){
+        int from = edgeList[i][0];
+        int to = edgeList[i][1];
+
+        graph[from].push_back(to);
+        graph[to].push_back(from);
+
+    }
+
+    unordered_map<int,bool> visited;
+    vector<pair<int,int>> bridge;
+    vector<int> timeOfInsertion(10,0);
+    vector<int> lowestTimeToReach(10,0);
+
+    //dfs starting parent -1
+
+    dfsBridge(1,-1,visited,timeOfInsertion,lowestTimeToReach,graph,bridge);
+
+    for(int i=0 ;i<bridge.size(); i++){
+        cout<<"("<<bridge[i].first<<","<<bridge[i].second<<") ";
+    }
+   
+
+}
+};
+
 int main(){
     /**
      * @brief Graph implementation undirected/bidirection
@@ -1033,13 +1121,25 @@ int main(){
     //  set.unionBySize(3,7);
     //  cout<<set.isSameComponent(3,7)<<endl;
 
-     vector<vector<int>> edgeList = {
-        {0, 1, 4},
-        {0, 2, 1},
-        {2, 1, 2},
-        {1, 3, 1},
-        {2, 3, 5},
-        {3, 4, 3}
+    //  vector<vector<int>> edgeList = {
+    //     {0, 1, 4},
+    //     {0, 2, 1},
+    //     {2, 1, 2},
+    //     {1, 3, 1},
+    //     {2, 3, 5},
+    //     {3, 4, 3}
+    // };
+
+    vector<vector<int>> edgeList = {
+        {1, 2},
+        {2, 3},
+        {3, 4},
+        {4, 7},
+        {3, 7},
+        {2, 6},
+        {1, 6},
+        {5, 6},
+        {1,5}
     };
     
     //  vector<vector<int>> edgeList={{1,2},{1,3},{1,4},{2,1},{2,5},{3,1},{3,8},{4,1},{4,6},{5,2},{5,8},{6,4},{6,7}
@@ -1074,6 +1174,10 @@ int main(){
 
     // shortesPathInWeightedGraph(1,5,edgeList);
     // dijkstra(1,4,edgeList);
-    primsAlgo(1,edgeList);
-    krushkalsAlgo(5,edgeList);
+    // primsAlgo(1,edgeList);
+    // krushkalsAlgo(5,edgeList);
+
+    Bridges b;
+
+    b.bridgesInGraph(edgeList);
 }
