@@ -1138,6 +1138,9 @@ void bridgesInGraph(vector<vector<int>> &edgeList){
         /**
          * @brief Articulation point (Trzan's algo)
          * 
+         * Intution- if child can't reach parent from any other way
+         *            then parent is articulation point
+         * 
          * Ariticaltion point is a point/node in a graph,
          * that if removed increase number of componets
          * 
@@ -1183,6 +1186,114 @@ void bridgesInGraph(vector<vector<int>> &edgeList){
         }
     }
 };
+
+
+void dfsSCC(int node, vector<int> &visited,stack<int> &nodes,unordered_map<int, vector<int>> &graph,
+            bool isScc, vector<int> &scc)
+    {
+    visited[node] = 1;
+
+    for(auto& neighbour: graph[node]){
+        if(!visited[neighbour]){
+            dfsSCC(neighbour,visited,nodes,graph,isScc,scc);
+        }
+    }
+
+    if(!isScc){
+    nodes.push(node);
+    }
+
+    if(isScc){
+        scc.push_back(node);
+    }
+}
+
+void StronglyConnectedComponent(vector<vector<int>> &edgelist){
+    /**
+     * @brief Find all strongly connected comp in graph
+     *          with kosaraju's Algo
+     * 
+     * Strongly Connected Components (SCCs) are groups of nodes 
+     * in a directed graph where every node is reachable from 
+     * every other node in the same group.
+     * 
+     *      1 --→ 2 --→ 3
+            ↑          ↓
+            ←-- - 4 ←---
+     * Nodes {1, 2, 3, 4} form a single SCC — all can reach each other.
+     *
+     *  1) Do dfs then and store the end node to stack
+     *  2) reverse the edges in graph
+     *  3) do dfs of all nodes in stack if not visited and store nodes
+     *  4) stored nodes list will list of SCC
+     * 
+     */
+
+     //graph
+
+     unordered_map<int, vector<int>> graph;
+
+     for(int i=0; i<edgelist.size(); i++){
+        int from = edgelist[i][0];
+        int to = edgelist[i][1];
+
+        graph[from].push_back(to);
+     }
+
+
+     vector<int> visited(10,0);
+     stack<int> nodes;
+     vector<int> scc;
+
+     //first dfs
+     for(const auto& node: graph){
+        if(!visited[node.first]){
+            dfsSCC(node.first,visited,nodes,graph,false,scc);
+        }
+     }
+
+     //revrse the graph
+     unordered_map<int, vector<int>> graph2;
+
+     for(int i=0; i<edgelist.size(); i++){
+        int from = edgelist[i][1];
+        int to = edgelist[i][0];
+
+        graph2[from].push_back(to);
+     }
+
+
+
+     //reset visited
+     for(int i=0; i<visited.size(); i++){
+        visited[i]=0;
+     }
+
+     
+
+     while (!nodes.empty())
+     {
+        int front = nodes.top();
+        nodes.pop();
+
+        if(!visited[front]){
+
+        dfsSCC(front,visited,nodes,graph2,true,scc);
+
+        //separator
+        scc.push_back(-1);
+        }
+
+     }
+     
+     for(int i=0; i<scc.size(); i++){
+        if(scc[i]== -1){
+            cout<<endl;
+        }else{
+        cout<<scc[i]<<", ";
+        }
+     }
+}
 
 int main(){
     /**
@@ -1233,11 +1344,16 @@ int main(){
     //     {1,5}
     // };
     vector<vector<int>> edgeList = {
+        {0,1},
         {1,2},
-        {1,3},
+        {2,0},
+        {2,3},
         {3,4},
-        {3,4},
-        {4,5}
+        {4,7},
+        {4,5},
+        {5,6},
+        {6,4},
+        {6,7},
     };
     
     //  vector<vector<int>> edgeList={{1,2},{1,3},{1,4},{2,1},{2,5},{3,1},{3,8},{4,1},{4,6},{5,2},{5,8},{6,4},{6,7}
@@ -1278,5 +1394,7 @@ int main(){
     Bridges b;
 
     // b.bridgesInGraph(edgeList);
-    b.articulatioPoints(edgeList);
+    // b.articulatioPoints(edgeList);
+
+    StronglyConnectedComponent(edgeList);
 }
