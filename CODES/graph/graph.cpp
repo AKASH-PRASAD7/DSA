@@ -1046,7 +1046,7 @@ public:
 
 void bridgesInGraph(vector<vector<int>> &edgeList){
     /**
-     * @brief Find all edge in graph
+     * @brief Find all edge in graph (Tarjan's bridge-finding algorithm.)
      * - A edge in a graph is a bridge when removing it increases 
      *   the number of components
      *  
@@ -1091,6 +1091,97 @@ void bridgesInGraph(vector<vector<int>> &edgeList){
    
 
 }
+
+    void dfsArticulationPoint(int node, int parent,unordered_map<int, bool> &visited,vector<int> &tin,
+    vector<int> &lst, unordered_map<int, vector<int>> &graph,vector<int> &artPoints)
+    {
+        visited[node] = true;
+
+        int AdjacentNbrs  = 0;
+        for(auto& nbr: graph[node]){
+
+            //skip parent
+            if(nbr == parent) continue;
+
+            if(!visited[nbr]){
+                AdjacentNbrs++;
+
+                //initalize tin & lst
+                tin[nbr] = ++timer;
+                lst[nbr] = timer;
+
+                dfsArticulationPoint(nbr,node,visited,tin,lst,graph,artPoints);
+
+                //check if nbr lst is less than curr or not
+                lst[node] = min(lst[node],lst[nbr]);
+
+                //check for articulation point
+
+                if(lst[nbr] >= tin[node] && parent != -1){
+                    artPoints.push_back(node);
+                }
+
+            }else{
+                // step 6
+                lst[node] = min(tin[nbr], lst[node]);
+            }
+
+        }
+        //check for source
+        if(AdjacentNbrs>1 && parent == -1){
+            //source is also artPoint
+            artPoints.push_back(node);
+        }
+    }
+
+    void articulatioPoints(vector<vector<int>> &edgelist){
+        /**
+         * @brief Articulation point (Trzan's algo)
+         * 
+         * Ariticaltion point is a point/node in a graph,
+         * that if removed increase number of componets
+         * 
+         *     1---3---4
+         *     |       |   (1,3,4 are Articulation points)
+         *     2       5
+         * 
+         *   1) same as trzan's algo
+         *   2) need visited, timeofInst(tin), lstTime(lst), timer
+         *   3) start with source node make its parent -1 start its dfs
+         *   4) mark it as visited and update timeofInst and lstlime
+         *   5) do dfs on adjacent neighbours(nbr) of current
+         *   6) if neighbour is visited then update   curr[lst] = min(nbr(tin),curr(lst))
+         *   7) if nbr not visited dfs call nbr with curr as parent
+         *   8) after dfs call,check and upadte curr[lst] = min(nbr(lst),curr(lst)) 
+         *   9) check if curr is art. point or not if lst(nbr)>= inst(curr) && curr[parent] != -1, then true 
+         *   10) for source node adjacent are > 1 then true
+         */ 
+
+        //graph
+
+        unordered_map<int, vector<int>> graph;
+
+        for(int i=0; i<edgelist.size(); i++){
+            int from = edgelist[i][0];
+            int to = edgelist[i][1];
+
+            graph[from].push_back(to);
+            graph[to].push_back(from);
+        }
+
+        unordered_map<int, bool> visited;
+        vector<int> tin(10); // timeOfinsetion
+        vector<int> lst(10); // lowesttimetoReach
+        vector<int> artPoints; // Articulation points
+
+        tin[1] = 1;
+        lst[1] = 1;
+        dfsArticulationPoint(1,-1,visited,tin,lst,graph,artPoints);
+
+        for(int i=0; i<artPoints.size(); i++){
+            cout<<artPoints[i]<<", ";
+        }
+    }
 };
 
 int main(){
@@ -1130,16 +1221,23 @@ int main(){
     //     {3, 4, 3}
     // };
 
+    // vector<vector<int>> edgeList = {
+    //     {1, 2},
+    //     {2, 3},
+    //     {3, 4},
+    //     {4, 7},
+    //     {3, 7},
+    //     {2, 6},
+    //     {1, 6},
+    //     {5, 6},
+    //     {1,5}
+    // };
     vector<vector<int>> edgeList = {
-        {1, 2},
-        {2, 3},
-        {3, 4},
-        {4, 7},
-        {3, 7},
-        {2, 6},
-        {1, 6},
-        {5, 6},
-        {1,5}
+        {1,2},
+        {1,3},
+        {3,4},
+        {3,4},
+        {4,5}
     };
     
     //  vector<vector<int>> edgeList={{1,2},{1,3},{1,4},{2,1},{2,5},{3,1},{3,8},{4,1},{4,6},{5,2},{5,8},{6,4},{6,7}
@@ -1179,5 +1277,6 @@ int main(){
 
     Bridges b;
 
-    b.bridgesInGraph(edgeList);
+    // b.bridgesInGraph(edgeList);
+    b.articulatioPoints(edgeList);
 }
