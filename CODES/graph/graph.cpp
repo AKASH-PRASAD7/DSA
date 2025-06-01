@@ -1295,6 +1295,50 @@ void StronglyConnectedComponent(vector<vector<int>> &edgelist){
      }
 }
 
+int min(int val1,int val2){
+    return val1<val2? val1: val2;
+}
+
+void bellmanFord(int vertices,int source,vector<vector<int>> &edgeList){
+    /**
+     * @brief Bellman ford (for shortes path)
+     *        works for -ve weights aswell
+     * 
+     * 1) reuirements distance array/vector
+     * 1.5) mark are nodes distance int_max and source as 0
+     * 2) for n nodes loop through n-1 times
+     * 3) and relax the edges, edge(from,to, weight)
+     * 4) relax of(to) → dist[to] = min(dist[from]+weight, dist[to])
+     * 5) after n-1 iteration will have shortest path distance array
+     * 
+     */
+
+     vector<int> distance(vertices,INT_MAX);
+
+     //mark source dist as 0
+     distance[source] = 0;
+
+     //loop n-1 times (vertices-1)
+     for(int i=1; i<vertices; i++){
+
+        // iterate over edges
+         for(int j=0; j<edgeList.size(); j++){
+             int from = edgeList[j][0];
+             int to = edgeList[j][1];
+             int weight = edgeList[j][2];
+             
+             //relax edges
+             if(distance[from] != INT_MAX){
+                 distance[to] = min(distance[from] + weight, distance[to]);
+             }
+        }
+     }
+
+     for(int i=0; i<distance.size(); i++){
+        cout<<distance[i]<<", ";
+     }
+}
+
 int main(){
     /**
      * @brief Graph implementation undirected/bidirection
@@ -1343,18 +1387,32 @@ int main(){
     //     {5, 6},
     //     {1,5}
     // };
+    // vector<vector<int>> edgeList = {
+    //     {0,1},
+    //     {1,2},
+    //     {2,0},
+    //     {2,3},
+    //     {3,4},
+    //     {4,7},
+    //     {4,5},
+    //     {5,6},
+    //     {6,4},
+    //     {6,7},
+    // };
+  
     vector<vector<int>> edgeList = {
-        {0,1},
-        {1,2},
-        {2,0},
-        {2,3},
-        {3,4},
-        {4,7},
-        {4,5},
-        {5,6},
-        {6,4},
-        {6,7},
+        {0, 1, 6},
+        {0, 2, 7},
+        {1, 2, 8},
+        {1, 3, 5},
+        {1, 4, -4},
+        {2, 3, -3},
+        {2, 4, 9},
+        {3, 1, -2},
+        {4, 3, 7},
+        {4, 0, 2}
     };
+
     
     //  vector<vector<int>> edgeList={{1,2},{1,3},{1,4},{2,1},{2,5},{3,1},{3,8},{4,1},{4,6},{5,2},{5,8},{6,4},{6,7}
     // ,{7,6},{7,8},{8,3},{8,5},{8,7}
@@ -1396,5 +1454,7 @@ int main(){
     // b.bridgesInGraph(edgeList);
     // b.articulatioPoints(edgeList);
 
-    StronglyConnectedComponent(edgeList);
+    // StronglyConnectedComponent(edgeList);
+
+    bellmanFord(5,0,edgeList);
 }
