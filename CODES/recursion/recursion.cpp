@@ -223,17 +223,83 @@ string subsets(string take, string s, string &ans){
      return ans;
 }   
 
+
+vector<vector<int>> subset(vector<int> &arr){
+    /**
+         * @brief Algorithm to generate all subsets of an array
+         * 
+         * Example: Input array [1, 2, 3]
+         * Output: [[], [1], [2], [1, 2], [3], [1, 3], [2, 3], [1, 2, 3]]
+         * 
+         * Steps:
+         * 1. Start with an empty subset: ans = [[]].
+         * 2. For each element in the array:
+         *    a. Create new subsets by adding the current element to all existing subsets in `ans`.
+         *    b. Store these new subsets temporarily in `levelans`.
+         *    c. Add all subsets in `levelans` to `ans`.
+         * 3. Repeat for all elements in the array.
+         * 4. Return the final `ans` containing all subsets.
+         * 
+         * Example Walkthrough:
+         * Input: [1, 2, 3]
+         * Step 1: Start with ans = [[]].
+         * Step 2: Process element 1:
+         *         New subsets = [[1]]
+         *         ans = [[], [1]]
+         * Step 3: Process element 2:
+         *         New subsets = [[2], [1, 2]]
+         *         ans = [[], [1], [2], [1, 2]]
+         * Step 4: Process element 3:
+         *         New subsets = [[3], [1, 3], [2, 3], [1, 2, 3]]
+         *         ans = [[], [1], [2], [1, 2], [3], [1, 3], [2, 3], [1, 2, 3]]
+         * Step 5: Return ans.
+    */
+
+     vector<vector<int>> ans;
+
+     ans.push_back({});
+
+     for(int i=0; i<arr.size(); i++){
+
+        vector<vector<int>> levelans;
+
+        for(int j=0; j<ans.size(); j++){
+
+            vector<int> temp = ans[j];
+            temp.push_back(arr[i]);
+            levelans.push_back(temp);
+
+        }
+        
+        for(int k=0; k<levelans.size(); k++){
+            vector<int> temp1 = levelans[k];
+            ans.push_back(temp1);
+        }
+
+     }
+     return ans;
+
+}
+
 int main(){
-    vector<int> arr = {5,6,7,8,1,2,3,4};
+    vector<int> arr = {1,2,3};
       
     // cout<<"sum: "<<sumOfN(arr,0,6);
     // cout<<roatatedBinarySearch(arr,0,7,6);
     // pattern(6);
 
-    string s ="abc";
-    string ans ="";
-        subsets("",s,ans);
-    cout<<ans;
+    // string s ="abc";
+    // string ans ="";
+    //     subsets("",s,ans);
+    // cout<<ans;
     
+    vector<vector<int>> ans = subset(arr);
+
+    for(int i=0; i<ans.size(); i++){
+        for(int j=0; j<ans[i].size(); j++){
+            cout<<"["<<ans[i][j]<<"] ";
+        }
+        cout<<endl;
+    }
 
 }
