@@ -156,11 +156,84 @@ int roatatedBinarySearch(vector<int> &arr, int start, int end, int key){
 
 }   
 
+void pattern (int n){
+
+    if(n==0){
+        return;
+    }
+
+    for(int i=0; i<n; i++){
+        cout<<"*";
+    }
+
+    cout<<endl;
+
+    pattern(n-1);
+}
+
+string removeA(string s, string &ans){
+
+    if(!s.size()){
+       return "";
+    }
+
+    if(s[0]!='a'){
+        ans += s[0];
+    }
+
+    return removeA(s.substr(1),ans);
+}
+
+string skipApple( string s,string &ans){
+
+    if(!s.size()){
+        return "";
+     }
+
+     if(s.substr(0,5)=="apple"){
+        ans =  skipApple(s.substr(5),ans);
+     }else{
+        ans = s[0] + skipApple(s.substr(1),ans);
+     }
+
+     return ans;
+
+}
+
+string subsets(string take, string s, string &ans){
+    /**
+     * @brief find all subsets (abc)
+     * algo take one char form s or ignore
+     * 
+     *  - take/s
+     *  
+     * 
+     */
+
+     if(s.empty()){
+       return ans+= " "+take;
+     }
+
+     //take
+     subsets(take+s[0], s.substr(1),ans);
+
+     //ignore
+     subsets(take,s.substr(1),ans);
+
+     return ans;
+}   
+
 int main(){
     vector<int> arr = {5,6,7,8,1,2,3,4};
       
     // cout<<"sum: "<<sumOfN(arr,0,6);
-    cout<<roatatedBinarySearch(arr,0,7,6);
+    // cout<<roatatedBinarySearch(arr,0,7,6);
+    // pattern(6);
+
+    string s ="abc";
+    string ans ="";
+        subsets("",s,ans);
+    cout<<ans;
     
 
 }
