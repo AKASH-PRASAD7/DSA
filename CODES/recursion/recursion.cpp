@@ -281,6 +281,52 @@ vector<vector<int>> subset(vector<int> &arr){
 
 }
 
+void findPermutation(string processed, string unprocessed,vector<string> &perm){
+    
+    if(!unprocessed.size()){
+        perm.push_back(processed);
+        return;
+    }
+
+
+
+    for(int i=0; i<=processed.size(); i++){
+        string newProcessed = processed.substr(0, i) + unprocessed[0] + processed.substr(i);
+        findPermutation(newProcessed, unprocessed.substr(1), perm);
+    }
+
+ 
+}
+
+void permutation(string s){
+    /**
+     * @brief permutations
+     * return all permuataion of s(abc)
+     *  
+     *          processed/unproceesed
+     *          
+     *              ""/(abc)
+     *                  |
+     *               "_a_"/(bc)
+     *                 /       \
+     *         "_b_a_"/(c)      "_a_b_"/(c)
+     *         /   |      \        /   |    \
+     *  "cba"/"" bca/""  bac/"" cab/"" acb/""  abc/""  => ans
+     *        
+     */
+
+     string processed = "";
+     string unprocesed = s;
+
+     vector<string> perm;
+
+     findPermutation(processed,unprocesed,perm);
+
+     for(int i=0; i<perm.size(); i++){
+        cout<<perm[i]<<endl;
+    }
+}
+
 int main(){
     vector<int> arr = {1,2,3};
       
@@ -293,13 +339,13 @@ int main(){
     //     subsets("",s,ans);
     // cout<<ans;
     
-    vector<vector<int>> ans = subset(arr);
+    // vector<vector<int>> ans = subset(arr);
 
-    for(int i=0; i<ans.size(); i++){
-        for(int j=0; j<ans[i].size(); j++){
-            cout<<"["<<ans[i][j]<<"] ";
-        }
-        cout<<endl;
-    }
-
+    // for(int i=0; i<ans.size(); i++){
+    //     for(int j=0; j<ans[i].size(); j++){
+    //         cout<<"["<<ans[i][j]<<"] ";
+    //     }
+    //     cout<<endl;
+    // }
+    permutation("abc");
 }
