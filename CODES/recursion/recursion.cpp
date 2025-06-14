@@ -327,6 +327,188 @@ void permutation(string s){
     }
 }
 
+int maze(int row,int col){
+    /**
+     * @brief Maze
+     * go from start to end and find how many ways
+     *             
+     *            0      1     2
+     *        0[ (0,0) (0,1) (0,2) ]
+     *        1[ (1,0) (1,1) (1,2) ]
+     *        2[ (2,0) (2,1) (2,2) ]
+     * 
+     * from(0,0) to (2,2) directions -> right/down
+     * 
+     */
+
+     if(row==2 || col==2){
+        return 1;
+     }
+
+
+     //go right
+     int right = 0;
+
+     if(col<2){
+     right = maze(row,col+1);
+     }
+
+     //go down
+     int down = 0;
+
+     if(row<2){
+        down = maze(row+1,col);
+     }
+
+     return right+down;
+}
+
+void mazePath(int row,int col,string currPath, vector<string> &path){
+
+    
+    if(row==2 && col==2){
+            path.push_back(currPath);
+            return;
+     }
+
+
+     //go right
+     if(col<2){
+        mazePath(row,col+1,currPath+"R", path);
+     }
+
+     //go down
+     if(row<2){
+         mazePath(row+1,col,currPath+"D",path);
+     }
+
+}
+void mazePath2(int row,int col,string currPath, vector<string> &path){
+
+    
+    if(row==2 && col==2){
+            path.push_back(currPath);
+            return;
+     }
+
+
+     //go right
+     if(col<2){
+        mazePath(row,col+1,currPath+"R", path);
+     }
+
+     //go diagonal
+     if(col<2 && row<2){
+        mazePath(row+1,col+1,currPath+"D", path);
+     }
+
+     //go down
+     if(row<2){
+         mazePath(row+1,col,currPath+"D",path);
+     }
+
+}
+
+void mazePathWithBacktracking(int row,int col,string currPath, vector<string> &path,vector<vector<int>> &maze){
+   
+    //in all direction up,down,left,right
+    // for each traversal make sure we dont traverse visited agian
+    // after each trvaersal mark cell as unvisited for other paths
+       /**
+     * @brief Maze
+     * go from start to end and find how many ways
+     *             
+     *            0      1     2
+     *        0[ (0,0) (0,1) (0,2) ]
+     *        1[ (1,0) (1,1) (1,2) ]
+     *        2[ (2,0) (2,1) (2,2) ]
+     * 
+     * from(0,0) to (2,2) directions -> up/down/left/right/diagonal
+     * 
+     *
+     * **/
+
+    int totalRow = maze.size()-1;
+    int totalCol = maze[0].size()-1;
+
+    
+
+    //if visited return
+    if(maze[row][col]){
+        return;
+    }
+
+    //after visiting mark as visited
+    maze[row][col]=1;
+
+    if(row==2 && col==2){
+            path.push_back(currPath);
+            maze[row][col] = 0; 
+            return;
+     }
+
+
+
+     //go right
+     if(col<totalCol){
+        mazePathWithBacktracking(row,col+1,currPath+"R", path,maze);
+     }
+
+     //go left
+     if(col>0){
+        mazePathWithBacktracking(row,col-1,currPath+"L", path,maze);
+     }
+
+     //go diagonal (btm right)
+     if(col<totalCol && row<totalRow){
+        mazePathWithBacktracking(row+1,col+1,currPath+",BR,", path,maze);
+     }
+
+     //go diagonal (top left)
+     if(col>0 && row>0){
+        mazePathWithBacktracking(row-1,col-1,currPath+",TL,", path,maze);
+     }
+
+     //go down
+     if(row<totalRow){
+        mazePathWithBacktracking(row+1,col,currPath+"D",path,maze);
+     }
+     //go up
+     if(row>0){
+        mazePathWithBacktracking(row-1,col,currPath+"U",path,maze);
+     }
+
+    //reset
+    maze[row][col]=0;
+}
+
+void mazePathWithObstacle(int row,int col,string currPath, vector<string> &path){
+   
+    //assuming (1,1) as obstacle 
+
+    if(row==1 && col==1){
+
+        return;
+    }
+    
+    if(row==2 && col==2){
+            path.push_back(currPath);
+            return;
+     }
+
+
+     //go right
+     if(col<2){
+        mazePathWithObstacle(row,col+1,currPath+"R", path);
+     }
+
+     //go down
+     if(row<2){
+        mazePathWithObstacle(row+1,col,currPath+"D",path);
+     }
+
+}
+
 int main(){
     vector<int> arr = {1,2,3};
       
@@ -347,5 +529,18 @@ int main(){
     //     }
     //     cout<<endl;
     // }
-    permutation("abc");
+
+    vector<vector<int>> maze = {
+        {0,0,0},
+        {0,0,0},
+        {0,0,0}
+    };
+
+    vector<string> path;
+    mazePathWithBacktracking(0,0,"",path,maze);
+
+    for(auto str:path){
+        cout<<str<<endl;
+    }
+
 }
