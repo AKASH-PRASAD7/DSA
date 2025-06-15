@@ -1,5 +1,6 @@
 #include<iostream>
 #include<vector>
+#include <utility>
 using namespace std;
 
   
@@ -509,6 +510,154 @@ void mazePathWithObstacle(int row,int col,string currPath, vector<string> &path)
 
 }
 
+bool checkLeftDiagonal (pair<int,int> queeen, pair<int,int> pos,int col){
+    //will return true if queen attacks
+    //if from pos i can reach queen then queen attacks
+
+    //check bottm left
+    if(queeen.first<pos.first && queeen.second<pos.second){
+        //considering 4x4 board
+        int posR = pos.first;
+        int posC = pos.second;
+
+        while(posR>=0 && posC>=0){
+            if(posR == queeen.first && posC == queeen.second){
+                return true;
+            }
+            posR--;
+            posC--;
+        }
+    }
+    return false;
+    //check top left
+    //no need since im placing quuens at top first
+}
+
+bool checkRightDiagonal (pair<int,int> queeen, pair<int,int> pos,int col){
+    //will return true if queen attacks
+    //if from pos i can reach queen then queen attacks
+
+    //check bottm left
+    if(queeen.first<pos.first && queeen.second>pos.second){
+        //considering 4x4 board
+        int posR = pos.first;
+        int posC = pos.second;
+
+        while(posR>=0 && posC<col){
+            if(posR == queeen.first && posC == queeen.second){
+                return true;
+            }
+            posR--;
+            posC++;
+        }
+    }
+    return false;
+    //check top left
+    //no need since im placing quuens at top first
+}
+
+bool isCellSafe (int row,int col,vector<pair<int,int>> &queenPos){
+    /**
+     * @brief check whether currsne tquerae is safe or not
+     * 
+     */
+
+     for(int i=0; i<queenPos.size(); i++){
+
+        int queenRow = queenPos[i].first;
+        int queenCol = queenPos[i].second;
+
+        //check horizaral
+        if(col == queenCol){
+            return false;
+        }
+
+        //check vertical
+        if(row == queenRow){
+            return false;
+        }
+
+        //check diagona;
+        pair<int,int> pos = {row,col};
+
+        //check \ diagnal
+        if(checkLeftDiagonal(queenPos[i], pos,col)){
+            return false;
+        }
+
+        //check / diagonal
+        if(checkRightDiagonal(queenPos[i], pos,col)){
+            return false;
+        }
+
+     }
+     return true;
+}
+
+int nQueen(int row,int col,int queens,vector<pair<int,int>> &queenPos){
+    /**
+     * @brief find all ways to pu n quuens in 
+     *          nxn chess board so that they dont cancel each other.
+     * 
+     *      0    1    2   3
+     *    --------------------
+       0    |   |  q |   |    |
+           --------------------
+       1    |   |   |   |  q  |
+            --------------------
+       2    | q  |   |   |    |
+            --------------------
+       3    |    |   | q  |    |
+            --------------------
+
+     *  
+        - first place queen in first row 1st cell
+        - then make recursion from 2nd row till end
+        - loop through each cell and place quuen if area safe
+        - if not cuur row not safe then backtrack      
+     *  - and place prev quuen in next cell
+        
+     */
+    
+            //all quueens placed
+            if(queens==0){
+                return 1;
+            }
+
+    if(row> col){ //since chess board is suaqare
+        //safety check
+        return -1;
+    }
+
+
+
+    int totalCol = col;
+    bool isSafe = false;
+    //move by col
+    for(int i=0; i<totalCol; i++){
+
+         isSafe = isCellSafe(row,i,queenPos);
+
+            if(isSafe){
+                
+                 queenPos.push_back({row,i});
+
+                if(nQueen(row+1,totalCol,queens-1,queenPos)){
+                    return 1;
+                }else{
+                    queenPos.pop_back();
+                }
+            }
+    }
+
+    if(!isSafe){
+        //if current row is not safe
+        return 0;
+    }
+
+}
+
+
 int main(){
     vector<int> arr = {1,2,3};
       
@@ -530,17 +679,23 @@ int main(){
     //     cout<<endl;
     // }
 
-    vector<vector<int>> maze = {
-        {0,0,0},
-        {0,0,0},
-        {0,0,0}
-    };
+    // vector<vector<int>> maze = {
+    //     {0,0,0},
+    //     {0,0,0},
+    //     {0,0,0}
+    // };
 
-    vector<string> path;
-    mazePathWithBacktracking(0,0,"",path,maze);
+    // vector<string> path;
+    // mazePathWithBacktracking(0,0,"",path,maze);
 
-    for(auto str:path){
-        cout<<str<<endl;
+    // for(auto str:path){
+    //     cout<<str<<endl;
+    // }
+    vector<pair<int,int>> queenPos;
+    nQueen(0,4,4,queenPos);
+
+    for(int i=0; i<queenPos.size(); i++){
+        cout<<"("<<queenPos[i].first<<","<<queenPos[i].second<<"), ";
     }
 
 }
