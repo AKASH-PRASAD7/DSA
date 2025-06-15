@@ -1,6 +1,7 @@
 #include<iostream>
 #include<vector>
 #include <utility>
+#include <unordered_map>
 using namespace std;
 
   
@@ -543,7 +544,7 @@ bool checkRightDiagonal (pair<int,int> queeen, pair<int,int> pos,int col){
         int posR = pos.first;
         int posC = pos.second;
 
-        while(posR>=0 && posC<col){
+        while(posR>=0 && posC<=col){
             if(posR == queeen.first && posC == queeen.second){
                 return true;
             }
@@ -556,7 +557,7 @@ bool checkRightDiagonal (pair<int,int> queeen, pair<int,int> pos,int col){
     //no need since im placing quuens at top first
 }
 
-bool isCellSafe (int row,int col,vector<pair<int,int>> &queenPos){
+bool isCellSafe (int row,int col,vector<pair<int,int>> &queenPos,int totalCol){
     /**
      * @brief check whether currsne tquerae is safe or not
      * 
@@ -581,12 +582,12 @@ bool isCellSafe (int row,int col,vector<pair<int,int>> &queenPos){
         pair<int,int> pos = {row,col};
 
         //check \ diagnal
-        if(checkLeftDiagonal(queenPos[i], pos,col)){
+        if(checkLeftDiagonal(queenPos[i], pos,totalCol)){
             return false;
         }
 
         //check / diagonal
-        if(checkRightDiagonal(queenPos[i], pos,col)){
+        if(checkRightDiagonal(queenPos[i], pos,totalCol)){
             return false;
         }
 
@@ -636,7 +637,7 @@ int nQueen(int row,int col,int queens,vector<pair<int,int>> &queenPos){
     //move by col
     for(int i=0; i<totalCol; i++){
 
-         isSafe = isCellSafe(row,i,queenPos);
+         isSafe = isCellSafe(row,i,queenPos,totalCol);
 
             if(isSafe){
                 
@@ -647,6 +648,101 @@ int nQueen(int row,int col,int queens,vector<pair<int,int>> &queenPos){
                 }else{
                     queenPos.pop_back();
                 }
+            }
+    }
+
+    if(!isSafe){
+        //if current row is not safe
+        return 0;
+    }
+
+}
+
+void printBoard(int dimension,vector<pair<int,int>> queenPos){
+
+    unordered_map<string,bool> pos;
+
+    for(int i=0; i<queenPos.size(); i++){
+        int f = queenPos[i].first;
+        int s = queenPos[i].second;
+
+        string p = to_string(f) + "," + to_string(s);
+        
+        pos[p] = true;
+    }
+
+    for(int i=0; i<dimension; i++){
+
+
+        for(int j=0; j<dimension; j++){
+            
+            string p = to_string(i) + "," + to_string(j);
+
+            if(pos[p]){
+                cout<<"Q";
+            }else{
+                cout<<"X";
+            }
+        
+        }
+        cout<<endl;
+
+    }
+
+    cout<<endl;
+}
+
+int nQueensALL(int row,int col,vector<pair<int,int>> &queenPos){
+    /**
+     * @brief find all ways to pu n quuens in 
+     *          nxn chess board so that they dont cancel each other.
+     * 
+     *      0    1    2   3
+     *    --------------------
+       0    |   |  q |   |    |
+           --------------------
+       1    |   |   |   |  q  |
+            --------------------
+       2    | q  |   |   |    |
+            --------------------
+       3    |    |   | q  |    |
+            --------------------
+
+     *  
+        - first place queen in first row 1st cell
+        - then make recursion from 2nd row till end
+        - loop through each cell and place quuen if area safe
+        - if not cuur row not safe then backtrack      
+     *  - and place prev quuen in next cell
+        
+     */
+    
+     
+
+    if(row == col){ //since chess board is suaqare
+        //safety check
+        //all queens places print
+        printBoard(col,queenPos);
+        return 1;
+    }
+
+
+
+    int totalCol = col;
+    bool isSafe = false;
+    //move by col
+    for(int i=0; i<totalCol; i++){
+
+         isSafe = isCellSafe(row,i,queenPos,totalCol);
+
+            if(isSafe){
+                
+                 queenPos.push_back({row,i});
+
+                nQueensALL(row+1,totalCol,queenPos);
+               
+                    queenPos.pop_back();
+                
             }
     }
 
@@ -692,10 +788,11 @@ int main(){
     //     cout<<str<<endl;
     // }
     vector<pair<int,int>> queenPos;
-    nQueen(0,4,4,queenPos);
+    // nQueen(0,4,4,queenPos);
+    nQueensALL(0,4,queenPos);
 
-    for(int i=0; i<queenPos.size(); i++){
-        cout<<"("<<queenPos[i].first<<","<<queenPos[i].second<<"), ";
-    }
+    // for(int i=0; i<queenPos.size(); i++){
+    //     cout<<"("<<queenPos[i].first<<","<<queenPos[i].second<<"), ";
+    // }
 
 }
